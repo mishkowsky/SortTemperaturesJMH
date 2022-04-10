@@ -32,57 +32,31 @@
 package org.spbstu.aleksandrov;
 
 import org.jetbrains.annotations.NotNull;
-import org.openjdk.jmh.annotations.*;
 
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static java.lang.Math.abs;
 
-@BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.MICROSECONDS)
-@State(Scope.Benchmark)
-@Fork(value = 1, jvmArgs = {"-Xms2G", "-Xmx2G"})
-@Warmup(iterations = 0)
-@Measurement(iterations = 5)
-public class MyBenchmark {
-
-    static Random random = new Random();
-
-    @Param({"100000", "1000000", "10000000"})
-    public int n = 100000;
-    @Param({"false", "true"})
-    public boolean edge = false;
-    public Temperature[] t;
-
-    @Setup(Level.Invocation)
-    public void setup() {
-        t = new Temperature[n];
-        for (int i = 0; i < n; i++) {
-            int r;
-            if (edge) r = 5000; else r = random.nextInt( 7731) - 2730;
-            t[i] = new Temperature(r);
-        }
-    }
+public class SortTemperatures {
 
     // Быстродействие: Timsort
     //                 Лучшее: O(n)
     //                 Худшее: O(nlog(n))
     // Ресурсоемкость: O(n)
-    @Benchmark
-    public void libSortTemperatures() {
+    public static void libSortTemperatures(Temperature[] t) {
         Arrays.sort(t);
     }
 
     // Быстродействие: O(n)
     // Ресурсоемкость: O(1)
-    @Benchmark
-    public void fastestSortTemperatures() {
+    public static void fastestSortTemperatures(Temperature[] t) {
 
         int[] range = new int[7731];
 
-        for (int i = 0; i < n; i++) {
-            Temperature temperature = t[i];
+        for (Temperature temperature : t) {
             int value = temperature.getValue();
             range[value + 2730] = range[value + 2730] + 1;
         }
@@ -103,8 +77,7 @@ public class MyBenchmark {
     //                 Худшее: O(n) + O(n/775 * log(n/775)) = O(nlog(n))
     // Ресурсоемкость: O(n)
     //                 Запись в корзины O(1) + Timsort корзин в среднем требует O(n/775), в худшем O(n)
-    @Benchmark
-    public void fastSortTemperatures() {
+    public static void fastSortTemperatures(Temperature[] t) {
 
         List<List<Integer>> range = new ArrayList<>(774);
 
@@ -112,10 +85,9 @@ public class MyBenchmark {
             range.add(new ArrayList<>());
         }
 
-        for (int i = 0; i < n; i++) {
-            Temperature temperature = t[i];
+        for (Temperature temperature : t) {
             int value = temperature.getValue();
-            int index = value / 10;
+            int index = value / 10 + 273;
             if (value > 0) index++;
             List<Integer> bucket = range.get(index);
             bucket.add(abs(value) % 10);
@@ -141,14 +113,11 @@ public class MyBenchmark {
 
     // Быстродействие: O(n^2)
     // Ресурсоемкость: O(n)
-    @Benchmark
-    public void slowSortTemperatures() {
+    public static void slowSortTemperatures(Temperature[] t) {
 
         List<Temperature> temperatures = new ArrayList<>();
 
-        for (int i = 0; i < n; i++) {
-
-            Temperature newTemp = t[i];
+        for (Temperature newTemp : t) {
 
             if (newTemp.getValue() < 0) {
                 // Перебираем элементы с начала
@@ -160,8 +129,7 @@ public class MyBenchmark {
                 }
                 // Если не добавили, вставляем в конец
                 if (!temperatures.contains(newTemp)) temperatures.add(newTemp);
-            }
-            else {
+            } else {
                 // Перебираем элементы с конца
                 int index = temperatures.size() - 1;
                 while (index >= 0) {
@@ -209,6 +177,13 @@ public class MyBenchmark {
             if (this.integerPart * this.sign != anotherT.integerPart * anotherT.sign)
                 return this.integerPart * this.sign - anotherT.integerPart * anotherT.sign;
             return this.fractionalPart * this.sign - anotherT.fractionalPart * anotherT.sign;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof Temperature)) return false;
+            Temperature t = (Temperature) o;
+            return this.getValue() == t.getValue();
         }
 
         public int getValue() {
