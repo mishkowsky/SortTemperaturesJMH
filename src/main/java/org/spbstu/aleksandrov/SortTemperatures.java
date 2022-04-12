@@ -43,8 +43,8 @@ import static java.lang.Math.abs;
 public class SortTemperatures {
 
     // Быстродействие: Timsort
-    //                 Лучшее: O(n)
     //                 Среднее, худшее: O(nlog(n))
+    //                 Лучшее: O(n)
     // Ресурсоемкость: O(n)
     public static void libSortTemperatures(Temperature[] t) {
         Arrays.sort(t);
@@ -73,8 +73,8 @@ public class SortTemperatures {
     }
 
     // Быстродействие: Запись всех значений по корзинам + сортировка корзин Timsort
+    //                 Среднее, худшее: O(n) + 774 * O(n/774 * log(n/774)) = O(nlog(n))
     //                 Лучшее: O(n) + 774 * O(n/774) = O(n)
-    //                 Среднее, худшее: O(n) + 774 * O(n/774 * log(n/774)) = O(nlog(n))Marks
     // Ресурсоемкость: O(n)
     //                 Запись в корзины O(n) + Timsort корзин в среднем требует O(n/774)
     public static void fastSortTemperatures(Temperature[] t) {
