@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.spbstu.aleksandrov.SortTemperatures.Temperature;
 import static org.spbstu.aleksandrov.SortTemperatures.*;
 
 public class SortTemperaturesTest {
@@ -43,9 +41,9 @@ public class SortTemperaturesTest {
     }
 
     @Test
-    void slowSortTemperatureTest() {
+    void insertionSortTemperatureTest() {
         setup();
-        slowSortTemperatures(actualTemperatures);
+        insertionSortTemperatures(actualTemperatures);
         Arrays.sort(expectedTemperatures);
         assertArrayEquals(expectedTemperatures, actualTemperatures);
     }

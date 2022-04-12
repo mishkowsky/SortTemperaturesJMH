@@ -44,7 +44,7 @@ public class SortTemperatures {
 
     // Быстродействие: Timsort
     //                 Лучшее: O(n)
-    //                 Худшее: O(nlog(n))
+    //                 Среднее, худшее: O(nlog(n))
     // Ресурсоемкость: O(n)
     public static void libSortTemperatures(Temperature[] t) {
         Arrays.sort(t);
@@ -73,10 +73,10 @@ public class SortTemperatures {
     }
 
     // Быстродействие: Запись всех значений по корзинам + сортировка корзин Timsort
-    //                 Лучшее: O(n) + O(n/775) = O(n)
-    //                 Худшее: O(n) + O(n/775 * log(n/775)) = O(nlog(n))
+    //                 Лучшее: O(n) + 774 * O(n/774) = O(n)
+    //                 Среднее, худшее: O(n) + 774 * O(n/774 * log(n/774)) = O(nlog(n))Marks
     // Ресурсоемкость: O(n)
-    //                 Запись в корзины O(1) + Timsort корзин в среднем требует O(n/775), в худшем O(n)
+    //                 Запись в корзины O(n) + Timsort корзин в среднем требует O(n/774)
     public static void fastSortTemperatures(Temperature[] t) {
 
         List<List<Integer>> range = new ArrayList<>(774);
@@ -111,42 +111,18 @@ public class SortTemperatures {
         }
     }
 
-    // Быстродействие: O(n^2)
-    // Ресурсоемкость: O(n)
-    public static void slowSortTemperatures(Temperature[] t) {
-
-        List<Temperature> temperatures = new ArrayList<>();
-
-        for (Temperature newTemp : t) {
-
-            if (newTemp.getValue() < 0) {
-                // Перебираем элементы с начала
-                for (Temperature temp : temperatures) {
-                    if (newTemp.compareTo(temp) < 0) {
-                        temperatures.add(temperatures.indexOf(temp), newTemp);
-                        break;
-                    }
-                }
-                // Если не добавили, вставляем в конец
-                if (!temperatures.contains(newTemp)) temperatures.add(newTemp);
-            } else {
-                // Перебираем элементы с конца
-                int index = temperatures.size() - 1;
-                while (index >= 0) {
-                    if (newTemp.compareTo(temperatures.get(index)) >= 0) {
-                        temperatures.add(index + 1, newTemp);
-                        break;
-                    }
-                    index--;
-                }
-                // Если не добавили, вставляем в начало
-                if (!temperatures.contains(newTemp)) temperatures.add(0, newTemp);
+    // Быстродействие: Среднее, худшее: O(n^2)
+    //                 Лучшее: O(n)
+    // Ресурсоемкость: O(1)
+    public static void insertionSortTemperatures(Temperature[] t) {
+        for (int i = 1; i < t.length; i++) {
+            Temperature current = t[i];
+            int j = i - 1;
+            for (; j >= 0; j--) {
+                if (t[j].compareTo(current) > 0) t[j+1] = t[j];
+                else break;
             }
-        }
-        int i = 0;
-        for (Temperature temp : temperatures) {
-            t[i] = temp;
-            i++;
+            t[j+1] = current;
         }
     }
 

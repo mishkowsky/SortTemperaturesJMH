@@ -10,14 +10,14 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @State(Scope.Benchmark)
 @Fork(value = 1, jvmArgs = {"-Xms2G", "-Xmx2G"})
-@Warmup(iterations = 10)
-@Measurement(iterations = 20)
+@Warmup(iterations = 5)
+@Measurement(iterations = 10)
 public class MyBenchmark {
 
     static Random random = new Random();
 
-    @Param({"1000", "1000000", "10000000"})
-    public int n = 1000;
+    @Param({"7731", "112000", "223000", "334000", "445000", "556000", "667000", "778000", "889000", "1000000"})
+    public int n = 7731;
     @Param({"false", "true"})
     public boolean edge = false;
     public SortTemperatures.Temperature[] t;
@@ -25,34 +25,47 @@ public class MyBenchmark {
     @Setup(Level.Invocation)
     public void setup() {
         t = new SortTemperatures.Temperature[n];
-        for (int i = 0; i < n; i++) {
-            int r;
-            if (edge) r = 5000; else r = random.nextInt( 7731) - 2730;
-            t[i] = new SortTemperatures.Temperature(r);
+        if (edge) {
+            int bucket = n / (2730 + 1 + 5000);
+            int index = 0;
+            for (int i = -2730; i < 5001; i++) {
+                for (int k = 0; k < bucket; k++) {
+                    t[index] = new SortTemperatures.Temperature(i);
+                    index++;
+                }
+            }
+            while (index < n) {
+                t[index] = new SortTemperatures.Temperature(5000);
+                index++;
+            }
+        } else {
+            for (int i = 0; i < n; i++) {
+                t[i] = new SortTemperatures.Temperature(random.nextInt(7731) - 2730);
+            }
         }
     }
 
     @Benchmark
     public void benchmarkLibSort(Blackhole bh) {
         SortTemperatures.libSortTemperatures(t);
-        //bh.consume(t);
+        bh.consume(t);
     }
 
     @Benchmark
     public void benchmarkFastestSort(Blackhole bh) {
         SortTemperatures.fastestSortTemperatures(t);
-        //bh.consume(t);
+        bh.consume(t);
     }
 
     @Benchmark
     public void benchmarkFastSort(Blackhole bh) {
         SortTemperatures.fastSortTemperatures(t);
-        //bh.consume(t);
+        bh.consume(t);
     }
 
     @Benchmark
-    public void benchmarkSlowSort(Blackhole bh) {
-        SortTemperatures.slowSortTemperatures(t);
-        //bh.consume(t);
+    public void benchmarkInsertionSort(Blackhole bh) {
+        SortTemperatures.insertionSortTemperatures(t);
+        bh.consume(t);
     }
 }
