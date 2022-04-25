@@ -147,9 +147,7 @@ public class SortTemperatures {
         }
 
         @Override
-        public int compareTo(@NotNull Object o) {
-            if (!(o instanceof Temperature)) return -1;
-            Temperature anotherT = (Temperature) o;
+        public int compareTo(@NotNull Temperature anotherT) {
             if (this.integerPart * this.sign != anotherT.integerPart * anotherT.sign)
                 return this.integerPart * this.sign - anotherT.integerPart * anotherT.sign;
             return this.fractionalPart * this.sign - anotherT.fractionalPart * anotherT.sign;
